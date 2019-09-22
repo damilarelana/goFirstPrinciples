@@ -1,0 +1,2 @@
+Just a random content of data ... for testing input/output on Go.
+To hash is not the dope thing in life

@@ -5,7 +5,8 @@
 !*/
 
 # Recursively all filles under
-# !/goGraphConstructor/**
+!/exercises/**
+!/testData/**
 
 # Do not include 3rd party packages
 /github.com/*

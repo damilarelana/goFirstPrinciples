@@ -16,7 +16,7 @@ func swap(x *float64, y *float64) (float64, float64) {
 }
 func main() {
 	var x, y float64
-	fmt.Println("Enter numbers [separated by a space] to be swapped:")
+	fmt.Println("Enter two numbers [separated by a space] to be swapped:")
 
 	// Reads 2 input variables x and y, that are separated by a space
 	fmt.Scanf("%f %f", &x, &y)

@@ -23,7 +23,7 @@ func main() {
 	}
 
 	// finally read the content itself
-	byteSlice := make([]byte, fileInfo.Size()) // create an empty byte slice using the size of the file in byte as reference
+	byteSlice := make([]byte, fileInfo.Size()) // create an empty byte slice using the size of the file in byte as reference [i.e. all data]
 	_, err = file.Read(byteSlice)              // we used the Read() method on the already existing byte data in "file" INTO the slice byteSlice
 	if err != nil {
 		// blank for now

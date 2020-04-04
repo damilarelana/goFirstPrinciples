@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 
 	_ "github.com/lib/pq"
 )
@@ -47,7 +48,7 @@ func main() {
 	// insert data into the database
 	sqlStatement := `INSERT INTO users (age, email, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id` // inserts data and returns the primary key
 	id := 0                                                                                                      // initialize to be an int
-	err = db.QueryRow(sqlStatement, 85, "Nick.Cannon@marvel.com", "Nick", "Cannon").Scan(&id)                    // execute the sql, and placed the returned value inside `&id`
+	err = db.QueryRow(sqlStatement, 25, "Cristiano.Ronaldo@fifa.com", "Cristiano", "Ronaldo").Scan(&id)          // execute the sql, and placed the returned value inside `&id`
 	if err != nil {
 		panic(err.Error())
 	}
@@ -114,17 +115,26 @@ func main() {
 	}
 	defer multipleRows.Close() // needed in case this did not go well
 
+	var users []User // create a slice of Users
+
 	for multipleRows.Next() { // start iterating over the returned rows i.e.
 		err = multipleRows.Scan(&user.ID, &user.Age, &user.FirstName, &user.LastName, &user.Email)
 		if err != nil {
 			panic(err.Error())
 		}
-		fmt.Println(user) // print the record extracted in each case
+		users = append(users, user) // append the newly scanned user to the existing slice of Users
+		fmt.Println(" ==== ==== ====")
+		fmt.Println("DataType is: ", reflect.TypeOf(user)) // prints out the datatype of user
+		fmt.Println(user)                                  // print the record extracted in each case
 	}
 
 	err = multipleRows.Err() // handle the error thrown when `multipleRos.Next() returns a false`
 	if err != nil {
 		panic(err.Error())
 	}
+
+	fmt.Println(" ==== ==== ====")
+	fmt.Println("DataType of Overall Users is: ", reflect.TypeOf(users)) // prints out the datatype of user
+	fmt.Println(users)                                                   // print the record extracted in each case
 
 }

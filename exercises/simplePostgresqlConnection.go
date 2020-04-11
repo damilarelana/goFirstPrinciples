@@ -48,7 +48,7 @@ func main() {
 	// insert data into the database
 	sqlStatement := `INSERT INTO users (age, email, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id` // inserts data and returns the primary key
 	id := 0                                                                                                      // initialize to be an int
-	err = db.QueryRow(sqlStatement, 25, "Lionel.Messi@fifa.com", "Lionel", "Messi").Scan(&id)                    // execute the sql, and placed the returned value inside `&id`
+	err = db.QueryRow(sqlStatement, 25, "Mikel.Arteta@arsenal.com", "Mikel", "Arteta").Scan(&id)                 // execute the sql, and placed the returned value inside `&id`
 	if err != nil {
 		panic(err.Error())
 	}

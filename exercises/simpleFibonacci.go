@@ -19,9 +19,9 @@ func fibonnaci(initialNum float64) (computedNum float64) {
 	for _, v := range zeroOneCase {
 		if initialNum == v {
 			computedNum = initialNum
-			return
+			return computedNum
 		}
 	}
 	computedNum = fibonnaci(initialNum-1) + fibonnaci(initialNum-2)
-	return
+	return computedNum
 }

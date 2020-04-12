@@ -13,8 +13,14 @@ func main() {
 	fmt.Println("Bubble Sort gives the smallest number as:", sortedArray[0])
 }
 
+// bubblesort()
+// - dynamically adjusts
+// - by reducing the inputListLength, after each inner loop iteration
+// - while still using a swap flag AND break point
+
 func bubblesort(dynamicArray []int) []int { // argument is a slice here
 	outerCount := 0
+	inputArrayLength := len(dynamicArray)
 OuterForLoop:
 	for outerCount < len(dynamicArray) {
 		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
@@ -34,6 +40,7 @@ OuterForLoop:
 			break OuterForLoop
 		}
 		outerCount++
+		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
 	}
 	return dynamicArray
 }

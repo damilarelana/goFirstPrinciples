@@ -16,15 +16,20 @@ func main() {
 	fmt.Println("BubbleSort gives largest num as:", sortedArray[len(sortedArray)-1])
 }
 
-// variadic parameters being used for BubbleSort
+// bubblesort()
+// - dynamically adjusts
+// - by reducing the inputListLength, after each inner loop iteration
+// - while still using a swap flag AND break point
+// - variadic parameters being used for BubbleSort
 func bubblesort(dynamicArray ...int) []int { // variadic arguments are used here
 	outerCount := 0
+	inputArrayLength := len(dynamicArray)
 OuterForLoop:
 	for outerCount < len(dynamicArray) {
 		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
 		swapflag := false
 		innerCount := 0
-		for innerCount < (len(dynamicArray) - 1) {
+		for innerCount < (inputArrayLength - 1) {
 			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
 				temp := dynamicArray[innerCount+1]
 				dynamicArray[innerCount+1] = dynamicArray[innerCount]
@@ -38,6 +43,7 @@ OuterForLoop:
 			break OuterForLoop
 		}
 		outerCount++
+		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
 	}
 	return dynamicArray
 }

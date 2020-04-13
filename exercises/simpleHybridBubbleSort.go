@@ -71,7 +71,7 @@ func arrayShuffler(array []int) {
 
 func main() {
 	// initialArray := []int{48, 96, 86, 68, 57, 82, 63, 70, 37, 34, 83, 27, 19, 97, 9, 17}
-	initialArray := createRandomList(0, 12476358, 96)
+	initialArray := createRandomList(0, 1247635, 96)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

@@ -28,7 +28,7 @@ func createRandomList(minValue int, maxValue int, stepValue int) (array []int) {
 
 func main() {
 	generationStartTime := time.Now()
-	array := createRandomList(0, 1247635, 96)
+	array := createRandomList(0, 12476358, 96)
 	generationTimeNow := time.Now()
 	arrayLength := len(array)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

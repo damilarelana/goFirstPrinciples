@@ -79,7 +79,7 @@ func budgetShopping(n int32, bundleQuantities []int32, bundleCosts []int32) int3
 // - by reducing the inputListLength, after each inner loop iteration
 // - while still using a swap flag AND break point
 // - sorts in descending order
-func bubbleSort(dynamicArray []int) []int { // arguments are used here
+func bubbleSort(dynamicArray []int) []int { // argument is a slice here
 	outerCount := 0
 	inputArrayLength := len(dynamicArray)
 OuterForLoop:
@@ -88,10 +88,8 @@ OuterForLoop:
 		swapflag := false
 		innerCount := 0
 		for innerCount < (inputArrayLength - 1) {
-			if dynamicArray[innerCount] < dynamicArray[innerCount+1] {
-				temp := dynamicArray[innerCount+1]
-				dynamicArray[innerCount+1] = dynamicArray[innerCount]
-				dynamicArray[innerCount] = temp
+			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
+				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
 				swapflag = true
 			}
 			innerCount++
@@ -103,5 +101,6 @@ OuterForLoop:
 		outerCount++
 		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
 	}
+
 	return dynamicArray
 }

@@ -30,10 +30,6 @@ func main() {
 	fmt.Println("\n")
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-	/*
-	 call bubblesort to sort the initial array
-	 initialArray... is used to pass the slice initialArray as variadic parameters
-	*/
 	// start time counter
 	fmt.Printf("\nOriginal Array: %v \n", array)
 	startTime := time.Now()

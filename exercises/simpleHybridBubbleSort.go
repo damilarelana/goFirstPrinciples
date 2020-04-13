@@ -11,7 +11,7 @@ import (
 // - by reducing the inputListLength, after each inner loop iteration
 // - while still using a swap flag AND break point
 // - variadic parameters being used for BubbleSort
-func bubbleSort(dynamicArray ...int) []int { // variadic arguments are used here
+func bubbleSort(dynamicArray []int) []int { // variadic arguments are used here
 	outerCount := 0
 	inputArrayLength := len(dynamicArray)
 OuterForLoop:
@@ -70,16 +70,17 @@ func arrayShuffler(array []int) {
 }
 
 func main() {
-	initialArray := []int{48, 96, 86, 68, 57, 82, 63, 70, 37, 34, 83, 27, 19, 97, 9, 17}
+	// initialArray := []int{48, 96, 86, 68, 57, 82, 63, 70, 37, 34, 83, 27, 19, 97, 9, 17}
+	initialArray := createRandomList(0, 12476358, 96)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println("")
 	fmt.Println("A golang implementation of Bubble Sort algorithm :")
-	fmt.Println(" - using random generated data")
+	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
-	fmt.Printf("  - with %d elements", arrayLength)
-	fmt.Printf("  - elements %v", initialArray)
+	fmt.Printf("  - with %d elements\n", arrayLength)
+	// fmt.Printf("  - and values %v", initialArray)
 	fmt.Println("\n")
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
@@ -89,7 +90,7 @@ func main() {
 	*/
 	// start time counter
 	startTime := time.Now()
-	var sortedArray = bubbleSort(initialArray...) // the array is passed as set of variadic arguments
+	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
 	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
 	fmt.Printf("runtime duration: %v \n", timeNow.Sub(startTime))

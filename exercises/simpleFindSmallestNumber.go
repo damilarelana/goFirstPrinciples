@@ -26,11 +26,9 @@ OuterForLoop:
 		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
 		swapflag := false
 		innerCount := 0
-		for innerCount < (len(dynamicArray) - 1) {
+		for innerCount < (inputArrayLength - 1) {
 			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
-				temp := dynamicArray[innerCount+1]
-				dynamicArray[innerCount+1] = dynamicArray[innerCount]
-				dynamicArray[innerCount] = temp
+				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
 				swapflag = true
 			}
 			innerCount++
@@ -42,5 +40,6 @@ OuterForLoop:
 		outerCount++
 		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
 	}
+
 	return dynamicArray
 }

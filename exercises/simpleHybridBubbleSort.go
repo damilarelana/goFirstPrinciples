@@ -80,9 +80,7 @@ func main() {
 	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
 	fmt.Printf("  - with %d elements\n", arrayLength)
-	// fmt.Printf("  - and values %v", initialArray)
-	fmt.Println("\n")
-	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 	/*
 	 call bubblesort to sort the initial array
@@ -93,7 +91,7 @@ func main() {
 	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
 	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
-	fmt.Printf("runtime duration: %v \n", timeNow.Sub(startTime))
+	fmt.Printf("runtime duration: %v seconds \n", timeNow.Sub(startTime).Seconds())
 	fmt.Printf("largest number is : %d \n", sortedArray[arrayLength-1])
 	fmt.Printf("smallest number is : %d \n\n", sortedArray[0])
 }

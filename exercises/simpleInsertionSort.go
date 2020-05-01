@@ -6,34 +6,24 @@ import (
 	"time"
 )
 
-// bubbleSort()
-// - dynamically adjusts
-// - by reducing the inputListLength, after each inner loop iteration
-// - while still using a swap flag AND break point
-// - variadic parameters being used for BubbleSort
-func bubbleSort(dynamicArray []int) []int { // variadic arguments are used here
-	outerCount := 0
+// insertionSort()
+func insertionSort(dynamicArray []int) []int {
 	inputArrayLength := len(dynamicArray)
-OuterForLoop:
-	for outerCount < len(dynamicArray) {
-		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
-		swapflag := false
-		innerCount := 0
-		for innerCount < (inputArrayLength - 1) {
-			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
-				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
-				swapflag = true
-			}
-			innerCount++
-		}
-		/* exiting from loop when already sorted input and sorting completion */
-		if !swapflag {
-			break OuterForLoop
-		}
-		outerCount++
-		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
+	if inputArrayLength == 1 {
+		return dynamicArray
 	}
-
+	// we assume that element at index `0` i.e. outerCount = 0, is already sorted, hence why the unsorted starts at outerCount = 1
+	outerCount := 1 // initialising unsorted list index to the first one to be removed from unsorted [we ]
+	for outerCount < inputArrayLength {
+		innerCount := outerCount // re-initialising sorted list's max index to allow countdown
+		for innerCount > 0 {     // handles inner loop i.e. the `sorted list loop`. greater than zero
+			if dynamicArray[innerCount-1] > dynamicArray[innerCount] { // this already carters for assuming list[0] is sorted
+				dynamicArray[innerCount-1], dynamicArray[innerCount] = dynamicArray[innerCount], dynamicArray[innerCount-1]
+			}
+			innerCount-- // this is different to bubbleSort i.e. where there is an increment. Here we are decreasing the unsorted set
+		}
+		outerCount++ // here we are increasing the sorted set boundaries [which weirdly also acts like the next `first element of the now shrinking unsorted set`]
+	}
 	return dynamicArray
 }
 
@@ -76,7 +66,7 @@ func main() {
 	arrayLength := len(initialArray)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println("")
-	fmt.Println("A golang implementation of a Hybrid Bubble Sort algorithm :")
+	fmt.Println("A golang implementation of Insertion Sort algorithm :")
 	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
 	fmt.Printf("  - with %d elements\n", arrayLength)
@@ -88,9 +78,9 @@ func main() {
 	*/
 	// start time counter
 	startTime := time.Now()
-	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
+	var sortedArray = insertionSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
-	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
+	fmt.Printf("\nInsertion Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
 	fmt.Printf("runtime duration: %v seconds \n", timeNow.Sub(startTime).Seconds())
 	fmt.Printf("largest number is : %d \n", sortedArray[arrayLength-1])
 	fmt.Printf("smallest number is : %d \n\n", sortedArray[0])

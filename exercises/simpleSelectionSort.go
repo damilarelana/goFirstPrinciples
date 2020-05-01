@@ -6,34 +6,33 @@ import (
 	"time"
 )
 
-// bubbleSort()
-// - dynamically adjusts
-// - by reducing the inputListLength, after each inner loop iteration
-// - while still using a swap flag AND break point
-// - variadic parameters being used for BubbleSort
-func bubbleSort(dynamicArray []int) []int { // variadic arguments are used here
-	outerCount := 0
+// selectionSort()
+func selectionSort(dynamicArray []int) []int {
 	inputArrayLength := len(dynamicArray)
+	if inputArrayLength == 1 {
+		return dynamicArray
+	}
+	outerCount := 0
+	minElement := outerCount // assume first index "0" is temporary minimum (changes with each pass)
 OuterForLoop:
-	for outerCount < len(dynamicArray) {
-		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
-		swapflag := false
-		innerCount := 0
-		for innerCount < (inputArrayLength - 1) {
-			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
-				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
-				swapflag = true
+	for outerCount < inputArrayLength {
+		innerCount := outerCount + 1        // make (or reset) innerCount to current "outerCount + 1"
+		for innerCount < inputArrayLength { // scanning by looping over all remaining items to test new minimum
+			if dynamicArray[innerCount] < dynamicArray[minElement] { // if any of the items if less than current minimum
+				minElement = innerCount // swaps out the index of the old with the new i.e. create new temporary minimum for remaining unsorted set
 			}
 			innerCount++
-		}
-		/* exiting from loop when already sorted input and sorting completion */
-		if !swapflag {
+		} // increase inner counter i.e. reducing unsorted list of items
+		dynamicArray[outerCount], dynamicArray[minElement] = dynamicArray[minElement], dynamicArray[outerCount] // confirm new minimum by swapping [temporary outerCount index with new minimum's index]
+		outerCount++                                                                                            // increase outer counter i.e. expanding the sorted set
+		minElement = outerCount                                                                                 // reset new temporary minimum index e.g. if initial was index `0`, it would now be `1`
+		if outerCount == (inputArrayLength - 1) {                                                               // i.e. only one unsorted element remains, break outer loop
 			break OuterForLoop
 		}
-		outerCount++
-		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
+		// note that we CANNOT use the optimization (loopRange -= 1) since we are shifting values/index around
+		// as such the last value after every iteration can still need to be touched
+		// this is one difference with BubbleSort() where the last index can be removed from dataset after every loop
 	}
-
 	return dynamicArray
 }
 
@@ -76,7 +75,7 @@ func main() {
 	arrayLength := len(initialArray)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println("")
-	fmt.Println("A golang implementation of a Hybrid Bubble Sort algorithm :")
+	fmt.Println("A golang implementation of Selection Sort algorithm :")
 	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
 	fmt.Printf("  - with %d elements\n", arrayLength)
@@ -88,9 +87,9 @@ func main() {
 	*/
 	// start time counter
 	startTime := time.Now()
-	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
+	var sortedArray = selectionSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
-	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
+	fmt.Printf("\nSelection Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
 	fmt.Printf("runtime duration: %v seconds \n", timeNow.Sub(startTime).Seconds())
 	fmt.Printf("largest number is : %d \n", sortedArray[arrayLength-1])
 	fmt.Printf("smallest number is : %d \n\n", sortedArray[0])

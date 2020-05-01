@@ -14,21 +14,13 @@ import (
 func bubbleSort(dynamicArray []int) []int { // variadic arguments are used here
 	outerCount := 0
 	inputArrayLength := len(dynamicArray)
-OuterForLoop:
 	for outerCount < len(dynamicArray) {
-		/* initial flag handles: sorted input, sorting completion, and bubbling loop */
-		swapflag := false
 		innerCount := 0
 		for innerCount < (inputArrayLength - 1) {
 			if dynamicArray[innerCount] > dynamicArray[innerCount+1] {
 				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
-				swapflag = true
 			}
 			innerCount++
-		}
-		/* exiting from loop when already sorted input and sorting completion */
-		if !swapflag {
-			break OuterForLoop
 		}
 		outerCount++
 		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
@@ -76,7 +68,7 @@ func main() {
 	arrayLength := len(initialArray)
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println("")
-	fmt.Println("A golang implementation of a Hybrid Bubble Sort algorithm :")
+	fmt.Println("A golang implementation of an Elegant Bubble Sort algorithm :")
 	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
 	fmt.Printf("  - with %d elements\n", arrayLength)
@@ -90,7 +82,7 @@ func main() {
 	startTime := time.Now()
 	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
-	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
+	fmt.Printf("\nElegant Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
 	fmt.Printf("runtime duration: %v seconds \n", timeNow.Sub(startTime).Seconds())
 	fmt.Printf("largest number is : %d \n", sortedArray[arrayLength-1])
 	fmt.Printf("smallest number is : %d \n\n", sortedArray[0])

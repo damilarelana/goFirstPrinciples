@@ -81,10 +81,6 @@ func main() {
 	fmt.Printf("  - with %d elements\n", arrayLength)
 	fmt.Println("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-	/*
-	 call bubblesort to sort the initial array
-	 initialArray... is used to pass the slice initialArray as variadic parameters
-	*/
 	// start time counter
 	startTime := time.Now()
 	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments

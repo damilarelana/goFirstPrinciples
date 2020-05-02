@@ -11,29 +11,30 @@ func selectionSort(dynamicArray []int) []int {
 	inputArrayLength := len(dynamicArray)
 	if inputArrayLength == 1 {
 		return dynamicArray
-	}
-	outerCount := 0
-	minElement := outerCount // assume first index "0" is temporary minimum (changes with each pass)
-OuterForLoop:
-	for outerCount < inputArrayLength {
-		innerCount := outerCount + 1        // make (or reset) innerCount to current "outerCount + 1"
-		for innerCount < inputArrayLength { // scanning by looping over all remaining items to test new minimum
-			if dynamicArray[innerCount] < dynamicArray[minElement] { // if any of the items if less than current minimum
-				minElement = innerCount // swaps out the index of the old with the new i.e. create new temporary minimum for remaining unsorted set
+	} else {
+		outerCount := 0
+		minElement := outerCount // assume first index "0" is temporary minimum (changes with each pass)
+	OuterForLoop:
+		for outerCount < inputArrayLength {
+			innerCount := outerCount + 1        // make (or reset) innerCount to current "outerCount + 1"
+			for innerCount < inputArrayLength { // scanning by looping over all remaining items to test new minimum
+				if dynamicArray[innerCount] < dynamicArray[minElement] { // if any of the items if less than current minimum
+					minElement = innerCount // swaps out the index of the old with the new i.e. create new temporary minimum for remaining unsorted set
+				}
+				innerCount++
+			} // increase inner counter i.e. reducing unsorted list of items
+			dynamicArray[outerCount], dynamicArray[minElement] = dynamicArray[minElement], dynamicArray[outerCount] // confirm new minimum by swapping [temporary outerCount index with new minimum's index]
+			outerCount++                                                                                            // increase outer counter i.e. expanding the sorted set
+			minElement = outerCount                                                                                 // reset new temporary minimum index e.g. if initial was index `0`, it would now be `1`
+			if outerCount == (inputArrayLength - 1) {                                                               // i.e. only one unsorted element remains, break outer loop
+				break OuterForLoop
 			}
-			innerCount++
-		} // increase inner counter i.e. reducing unsorted list of items
-		dynamicArray[outerCount], dynamicArray[minElement] = dynamicArray[minElement], dynamicArray[outerCount] // confirm new minimum by swapping [temporary outerCount index with new minimum's index]
-		outerCount++                                                                                            // increase outer counter i.e. expanding the sorted set
-		minElement = outerCount                                                                                 // reset new temporary minimum index e.g. if initial was index `0`, it would now be `1`
-		if outerCount == (inputArrayLength - 1) {                                                               // i.e. only one unsorted element remains, break outer loop
-			break OuterForLoop
+			// note that we CANNOT use the optimization (loopRange -= 1) since we are shifting values/index around
+			// as such the last value after every iteration can still need to be touched
+			// this is one difference with BubbleSort() where the last index can be removed from dataset after every loop
 		}
-		// note that we CANNOT use the optimization (loopRange -= 1) since we are shifting values/index around
-		// as such the last value after every iteration can still need to be touched
-		// this is one difference with BubbleSort() where the last index can be removed from dataset after every loop
+		return dynamicArray
 	}
-	return dynamicArray
 }
 
 // createRandomList()

@@ -6,12 +6,11 @@ import (
 	"time"
 )
 
-// bubbleSort()
+// hybridBubbleSort()
 // - dynamically adjusts
 // - by reducing the inputListLength, after each inner loop iteration
 // - while still using a swap flag AND break point
-// - variadic parameters being used for BubbleSort
-func bubbleSort(dynamicArray []int) []int { // variadic arguments are used here
+func hybridBubbleSort(dynamicArray []int) []int { // variadic arguments are used here
 	outerCount := 0
 	inputArrayLength := len(dynamicArray)
 OuterForLoop:
@@ -82,13 +81,9 @@ func main() {
 	fmt.Printf("  - with %d elements\n", arrayLength)
 	fmt.Println("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-	/*
-	 call bubblesort to sort the initial array
-	 initialArray... is used to pass the slice initialArray as variadic parameters
-	*/
 	// start time counter
 	startTime := time.Now()
-	var sortedArray = bubbleSort(initialArray) // the array is passed as set of variadic arguments
+	var sortedArray = hybridBubbleSort(initialArray) // the array is passed as set of variadic arguments
 	timeNow := time.Now()
 	fmt.Printf("\nHybrid Bubble Sort gives [first 15 elements as]: %v \n", sortedArray[:15])
 	fmt.Printf("runtime duration: %v seconds \n", timeNow.Sub(startTime).Seconds())

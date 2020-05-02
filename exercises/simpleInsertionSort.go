@@ -11,20 +11,21 @@ func insertionSort(dynamicArray []int) []int {
 	inputArrayLength := len(dynamicArray)
 	if inputArrayLength == 1 {
 		return dynamicArray
-	}
-	// we assume that element at index `0` i.e. outerCount = 0, is already sorted, hence why the unsorted starts at outerCount = 1
-	outerCount := 1 // initialising unsorted list index to the first one to be removed from unsorted [we ]
-	for outerCount < inputArrayLength {
-		innerCount := outerCount // re-initialising sorted list's max index to allow countdown
-		for innerCount > 0 {     // handles inner loop i.e. the `sorted list loop`. greater than zero
-			if dynamicArray[innerCount-1] > dynamicArray[innerCount] { // this already carters for assuming list[0] is sorted
-				dynamicArray[innerCount-1], dynamicArray[innerCount] = dynamicArray[innerCount], dynamicArray[innerCount-1]
+	} else {
+		// we assume that element at index `0` i.e. outerCount = 0, is already sorted, hence why the unsorted starts at outerCount = 1
+		outerCount := 1 // initialising unsorted list index to the first one to be removed from unsorted [we ]
+		for outerCount < inputArrayLength {
+			innerCount := outerCount // re-initialising sorted list's max index to allow countdown
+			for innerCount > 0 {     // handles inner loop i.e. the `sorted list loop`. greater than zero
+				if dynamicArray[innerCount-1] > dynamicArray[innerCount] { // this already carters for assuming list[0] is sorted
+					dynamicArray[innerCount-1], dynamicArray[innerCount] = dynamicArray[innerCount], dynamicArray[innerCount-1]
+				}
+				innerCount-- // this is different to bubbleSort i.e. where there is an increment. Here we are decreasing the unsorted set
 			}
-			innerCount-- // this is different to bubbleSort i.e. where there is an increment. Here we are decreasing the unsorted set
+			outerCount++ // here we are increasing the sorted set boundaries [which weirdly also acts like the next `first element of the now shrinking unsorted set`]
 		}
-		outerCount++ // here we are increasing the sorted set boundaries [which weirdly also acts like the next `first element of the now shrinking unsorted set`]
+		return dynamicArray
 	}
-	return dynamicArray
 }
 
 // createRandomList()
@@ -72,10 +73,6 @@ func main() {
 	fmt.Printf("  - with %d elements\n", arrayLength)
 	fmt.Println("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-	/*
-	 call bubblesort to sort the initial array
-	 initialArray... is used to pass the slice initialArray as variadic parameters
-	*/
 	// start time counter
 	startTime := time.Now()
 	var sortedArray = insertionSort(initialArray) // the array is passed as set of variadic arguments

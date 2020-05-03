@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/go-echarts/go-echarts/charts"
@@ -40,9 +41,11 @@ func insertionSort(dynamicArray []int) ([]int, map[int][]int) {
 				}
 				innerCount-- // this is different to bubbleSort i.e. where there is an increment. Here we are decreasing the unsorted set
 				// golang inherently creates a copy of the argument when passing it to a function
-				//	 - thus updateAnimationDataMap() inherently avoids the problem of being passed a reference to an array [i.e. that causes python to always store only final sorted state]
+				//	 - but it is still being passed a copy of the same address [so ends up with same problem as python]
+				tempArrayState := make([]int, inputArrayLength)
+				copy(tempArrayState, dynamicArray)
+				updateAnimationDataMap(tempArrayState, iSMapKey, iSPlotDataMapPtr, inputArrayLength)
 				iSMapKey++ //  increase Map key before it is used in updateAnimationDataMap
-				updateAnimationDataMap(dynamicArray, iSMapKey, iSPlotDataMapPtr, inputArrayLength)
 			}
 			outerCount++ // here we are increasing the sorted set boundaries [which weirdly also acts like the next `first element of the now shrinking unsorted set`]
 		}
@@ -66,8 +69,10 @@ func elegantBubbleSort(dynamicArray []int) ([]int, map[int][]int) {
 				dynamicArray[innerCount], dynamicArray[innerCount+1] = dynamicArray[innerCount+1], dynamicArray[innerCount]
 			}
 			innerCount++
+			tempArrayState := make([]int, inputArrayLength)
+			copy(tempArrayState, dynamicArray)
+			updateAnimationDataMap(tempArrayState, eBSMapKey, eBSPlotDataMapPtr, inputArrayLength)
 			eBSMapKey++ // increase Map key before it is used in updateAnimationDataMap
-			updateAnimationDataMap(dynamicArray, eBSMapKey, eBSPlotDataMapPtr, inputArrayLength)
 		}
 		outerCount++
 		inputArrayLength-- // decrement array length before next iteration, since previous largest value does not need to be involved in next iterations
@@ -96,9 +101,10 @@ OuterForLoop:
 				swapflag = true
 			}
 			innerCount++
+			tempArrayState := make([]int, inputArrayLength)
+			copy(tempArrayState, dynamicArray)
+			updateAnimationDataMap(tempArrayState, hBSMapKey, hBSPlotDataMapPtr, inputArrayLength)
 			hBSMapKey++ // increase Map key before it is used in updateAnimationDataMap
-			updateAnimationDataMap(dynamicArray, hBSMapKey, hBSPlotDataMapPtr, inputArrayLength)
-
 		}
 		/* exiting from loop when already sorted input and sorting completion */
 		if !swapflag {
@@ -131,8 +137,11 @@ func selectionSort(dynamicArray []int) ([]int, map[int][]int) {
 				innerCount++
 			} // increase inner counter i.e. reducing unsorted list of items
 			dynamicArray[outerCount], dynamicArray[minElement] = dynamicArray[minElement], dynamicArray[outerCount] // confirm new minimum by swapping [temporary outerCount index with new minimum's index]
-			sSMapKey++                                                                                              //  increase Map key before it is used in updateAnimationDataMap
-			updateAnimationDataMap(dynamicArray, sSMapKey, sSPlotDataMapPtr, inputArrayLength)
+
+			tempArrayState := make([]int, inputArrayLength)
+			copy(tempArrayState, dynamicArray)
+			updateAnimationDataMap(tempArrayState, sSMapKey, sSPlotDataMapPtr, inputArrayLength)
+			sSMapKey++ //  increase Map key before it is used in updateAnimationDataMap
 
 			outerCount++                              // increase outer counter i.e. expanding the sorted set
 			minElement = outerCount                   // reset new temporary minimum index e.g. if initial was index `0`, it would now be `1`
@@ -277,7 +286,6 @@ func indexSplitter(inputListLowerIndex int, inputListUpperIndex int) int {
 func initAnimationDataMap(inputArray []int) (map[int][]int, int) {
 	key := 0                           // initialize the map's key to store
 	plotDataMap := make(map[int][]int) // initialize the map itself
-	plotDataMap[key] = inputArray
 	return plotDataMap, key
 }
 
@@ -321,37 +329,49 @@ func updateAnimationDataMap(arrayWhileSorting []int, key int, plotDataMapPtr *ma
 	(*plotDataMapPtr)[key] = augmentedArray // add augmentArray to map : Golang automatically accommodates new key
 }
 
+// baseBar
+func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	for _, stateData := range plotDataArrays {
+		bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	}
+	return bar
+}
+
 // createAnimation()
-func createAnimation(plotDataMap map[int][]int, arrayLength int, algorithmName string) http.Handler {
+func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, _ *http.Request) {
 			lastIndex := arrayLength - 1
 			xAxisItems := createRandomArray(0, lastIndex, 1)
-			bar := charts.NewBar()
-			bar.SetGlobalOptions(charts.TitleOpts{Title: algorithmName})
-			for index, stateData := range plotDataMap {
-				bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
-				f, err := os.Create("bar.html")
-				if err != nil {
-					errMsg := fmt.Sprintf("Unable to create bar.html for stateData at plotDataMap index %d", index)
-					ErrMsgHandler(errMsg, err)
-				}
-				bar.Render(w, f)
+			page := charts.NewPage()
+			page.Add(
+				baseBar(xAxisItems, algorithmName, plotDataArrays),
+			)
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
 			}
+			page.Render(w, f)
 		})
 }
 
 // defaultMux defines the router Mux
-func defaultMux(plotDataMap map[int][]int, arrayLength int, algorithmName string) *mux.Router {
+func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *mux.Router {
 	newRouter := mux.NewRouter().StrictSlash(true)
-	newRouter.Handle("/", createAnimation(plotDataMap, arrayLength, algorithmName))
+	newRouter.Handle("/", createAnimation(plotDataArrays, arrayLength, algorithmName))
 	return newRouter
 }
 
 // InitializeWebServer
-func initRenderWebServer(port string, plotDataMap map[int][]int, arrayLength int, algorithmName string) {
-	mux := defaultMux(plotDataMap, arrayLength, algorithmName) // create an instance of defaultMux()
-	log.Println("animation rendering initialize at http://127.0.0.1:" + port)
+func initRenderWebServer(port string, plotDataArrays [][]int, arrayLength int, algorithmName string) {
+	mux := defaultMux(plotDataArrays, arrayLength, algorithmName) // create an instance of defaultMux()
+	log.Println("animation rendering at http://127.0.0.1:" + port)
 	// log.Fatal(errors.Wrap(http.ListenAndServe(":"+port, mux), "Failed to start webserver at port:"+port))
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
@@ -362,11 +382,25 @@ func getFuncName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
+/* parsePlotData()
+- takes in the returned plotDataMap
+- parses it through a for loop so as to generate a `array of array`
+  + to extract the [index, stateData] at each dictionary key
+*/
+func parsePlotData(plotDataMap map[int][]int) [][]int {
+	mapLength := len(plotDataMap)               // get number of items in the map i.e. how many stateData do we have
+	arrayOfArrays := make([][]int, mapLength)   // create an empty array of Arrays to be populated
+	for index, stateData := range plotDataMap { // iterated over the Map to extract stateData and insert into an arrayOfArrays
+		arrayOfArrays[index] = stateData
+	}
+	return arrayOfArrays // returns the array of arrays, required by animation
+}
+
 // main
 func main() {
 
 	// initialArray := createRandomArray(0, 1247635, 48)
-	initialArray := createRandomArray(0, 124, 48)
+	initialArray := createRandomArray(0, 200, 48)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 
@@ -415,7 +449,7 @@ func main() {
 	mSStartTime := time.Now()
 	mergesorted := mergeSort(mSInputArray) // the array is passed as set of variadic arguments
 	mSTimeNow := time.Now()
-	fmt.Printf("Merge Sort gives first %d elements as: %v \n", printedSliceLength, mergesorted[:printedSliceLength+1])
+	fmt.Printf("Merge Sort gives first %d elements as: %v \n", printedSliceLength+1, mergesorted[:printedSliceLength+1])
 	fmt.Printf("runtime: %v seconds \n", mSTimeNow.Sub(mSStartTime).Seconds())
 	fmt.Printf("largest num: %d \n", mergesorted[arrayLength-1])
 	fmt.Printf("smallest num: %d \n", mergesorted[0])
@@ -425,21 +459,23 @@ func main() {
 	iSStartTime := time.Now()
 	insertionsorted, iSPlotData := insertionSort(iSInputArray) // the array is passed as set of variadic arguments
 	iSTimeNow := time.Now()
-	fmt.Printf("\nInsertion Sort gives first %d elements as: %v \n", printedSliceLength, insertionsorted[:printedSliceLength+1])
+	fmt.Printf("\nInsertion Sort gives first %d elements as: %v \n", printedSliceLength+1, insertionsorted[:printedSliceLength+1])
 	fmt.Printf("runtime: %v seconds \n", iSTimeNow.Sub(iSStartTime).Seconds())
 	fmt.Printf("largest num: %d \n", insertionsorted[arrayLength-1])
 	fmt.Printf("smallest num: %d \n", insertionsorted[0])
 	fmt.Println("================================")
 	// animation creation
-	algorithmName := getFuncName(insertionSort) // get the function name as a string
-	initRenderWebServer("8080", iSPlotData, arrayLength, algorithmName)
+	algorithmName := getFuncName(insertionSort)                                    // get the function name as a string. This gives "main.insertionSort"
+	algorithmName = strings.TrimLeft(strings.TrimLeft(algorithmName, "main"), ".") // trim the string to remove extraneous stuff
+	plotDataArrays := parsePlotData(iSPlotData)
+	initRenderWebServer("8080", plotDataArrays, arrayLength, algorithmName)
 	print("================================")
 
 	// start time counter
 	sSStartTime := time.Now()
 	selectionSorted, _ := selectionSort(sSInputArray) // the array is passed as set of variadic arguments
 	sSTimeNow := time.Now()
-	fmt.Printf("\nSelection Sort gives first %d elements as: %v \n", printedSliceLength, selectionSorted[:printedSliceLength+1])
+	fmt.Printf("\nSelection Sort gives first %d elements as: %v \n", printedSliceLength+1, selectionSorted[:printedSliceLength+1])
 	fmt.Printf("runtime: %v seconds \n", sSTimeNow.Sub(sSStartTime).Seconds())
 	fmt.Printf("largest num: %d \n", selectionSorted[arrayLength-1])
 	fmt.Printf("smallest num: %d \n", selectionSorted[0])
@@ -449,7 +485,7 @@ func main() {
 	hBSStartTime := time.Now()
 	hybridBubblesorted, _ := hybridBubbleSort(hBSInputArray) // the array is passed as set of variadic arguments
 	hBSTimeNow := time.Now()
-	fmt.Printf("\nHybrid Bubble Sort gives first %d elements as: %v \n", printedSliceLength, hybridBubblesorted[:printedSliceLength+1])
+	fmt.Printf("\nHybrid Bubble Sort gives first %d elements as: %v \n", printedSliceLength+1, hybridBubblesorted[:printedSliceLength+1])
 	fmt.Printf("runtime: %v seconds \n", hBSTimeNow.Sub(hBSStartTime).Seconds())
 	fmt.Printf("largest num: %d \n", hybridBubblesorted[arrayLength-1])
 	fmt.Printf("smallest num: %d \n", hybridBubblesorted[0])
@@ -459,7 +495,7 @@ func main() {
 	eBSStartTime := time.Now()
 	elegantBubblesorted, _ := elegantBubbleSort(eBSInputArray) // the array is passed as set of variadic arguments
 	eBSTimeNow := time.Now()
-	fmt.Printf("\nElegant Bubble Sort gives first %d elements as: %v \n", printedSliceLength, elegantBubblesorted[:printedSliceLength+1])
+	fmt.Printf("\nElegant Bubble Sort gives first %d elements as: %v \n", printedSliceLength+1, elegantBubblesorted[:printedSliceLength+1])
 	fmt.Printf("runtime: %v seconds \n", eBSTimeNow.Sub(eBSStartTime).Seconds())
 	fmt.Printf("largest num: %d \n", elegantBubblesorted[arrayLength-1])
 	fmt.Printf("smallest num: %d \n", elegantBubblesorted[0])

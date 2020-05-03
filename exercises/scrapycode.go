@@ -139,3 +139,37 @@ func setupPlotParams(arrayMinValue int, arrayMaxValue int, inputArrayLength int)
   
   return fig, ax
 }
+
+
+
+// createAnimation()
+func createAnimation(plotDataMap map[int][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			bar := charts.NewBar()
+			bar.SetGlobalOptions(charts.TitleOpts{Title: algorithmName})
+			bar.AddXAxis(xAxisItems)
+			f, err := os.Create("bar.html")
+			for index, stateData := range plotDataMap {
+				bar.AddYAxis("Array State", stateData)
+				if err != nil {
+					errMsg := fmt.Sprintf("Unable to create bar.html for stateData at plotDataMap index %d", index)
+					ErrMsgHandler(errMsg, err)
+				}
+				bar.Render(w, f)
+			}
+		})
+}
+
+
+func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	bar.AddXAxis(xAxisItems).AddYAxis("Array State", plotDataArrays)
+	return bar
+}

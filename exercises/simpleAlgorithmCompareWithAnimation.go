@@ -366,7 +366,7 @@ func getFuncName(i interface{}) string {
 func main() {
 
 	// initialArray := createRandomArray(0, 1247635, 48)
-	initialArray := createRandomArray(0, 124763, 48)
+	initialArray := createRandomArray(0, 124, 48)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 
@@ -399,7 +399,7 @@ func main() {
 	if arrayLength > 20 {
 		printedSliceLength = 15
 	} else {
-		printedSliceLength = arrayLength
+		printedSliceLength = arrayLength - 1
 	}
 
 	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -408,7 +408,7 @@ func main() {
 	fmt.Println("  - using randomly generated data")
 	fmt.Printf("  - of an array of integer values\n")
 	fmt.Printf("  - with %d elements\n", arrayLength)
-	fmt.Printf("  - first %d elements: %v\n", printedSliceLength, initialArray[:printedSliceLength+1])
+	fmt.Printf("  - first %d elements: %v\n", printedSliceLength+1, initialArray[:printedSliceLength+1])
 	fmt.Println("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 	// start time counter

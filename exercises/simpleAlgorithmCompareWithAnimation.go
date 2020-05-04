@@ -330,15 +330,13 @@ func updateAnimationDataMap(arrayWhileSorting []int, key int, plotDataMapPtr *ma
 }
 
 // baseBar
-func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.TitleOpts{Title: algorithmName},
 		charts.ToolboxOpts{Show: true},
 	)
-	for _, stateData := range plotDataArrays {
-		bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
-	}
+	bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
 	return bar
 }
 
@@ -348,16 +346,25 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 		func(w http.ResponseWriter, _ *http.Request) {
 			lastIndex := arrayLength - 1
 			xAxisItems := createRandomArray(0, lastIndex, 1)
-			page := charts.NewPage()
-			page.Add(
-				baseBar(xAxisItems, algorithmName, plotDataArrays),
-			)
-			f, err := os.Create("bar.html")
-			if err != nil {
-				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
-				ErrMsgHandler(errMsg, err)
+			for index, stateData := range plotDataArrays {
+				if index != 0 {
+					err := os.Remove("bar.html")
+					if err != nil {
+						errMsg := fmt.Sprintf("Unable to remove the 'bar.html' for stateData %d, before new render for stateData %d", index-1, index)
+						ErrMsgHandler(errMsg, err)
+					}
+				}
+				page := charts.NewPage()
+				f, err := os.Create("bar.html")
+				if err != nil {
+					errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+					ErrMsgHandler(errMsg, err)
+				}
+				page.Add(
+					baseBar(xAxisItems, algorithmName, stateData),
+				)
+				page.Render(w, f)
 			}
-			page.Render(w, f)
 		})
 }
 
@@ -400,7 +407,7 @@ func parsePlotData(plotDataMap map[int][]int) [][]int {
 func main() {
 
 	// initialArray := createRandomArray(0, 1247635, 48)
-	initialArray := createRandomArray(0, 200, 48)
+	initialArray := createRandomArray(0, 480, 48)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 

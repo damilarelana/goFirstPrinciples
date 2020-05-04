@@ -173,3 +173,56 @@ func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *ch
 	bar.AddXAxis(xAxisItems).AddYAxis("Array State", plotDataArrays)
 	return bar
 }
+
+// createAnimation()
+func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			page.Add(
+				baseBar(xAxisItems, algorithmName, plotDataArrays),
+			)
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			page.Render(w, f)
+		})
+}
+
+// baseBar
+func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	for _, stateData := range plotDataArrays {
+		bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	}
+	return bar
+}
+
+
+// createAnimation()
+func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			for _, stateData := range plotDataArrays {
+				page.Add(
+					baseBar(xAxisItems, algorithmName, stateData),
+				)
+				f, err := os.Create("bar.html")
+				if err != nil {
+					errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+					ErrMsgHandler(errMsg, err)
+				}
+				page.Render(w, f)
+			}
+		})

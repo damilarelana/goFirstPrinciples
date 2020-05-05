@@ -225,4 +225,64 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 				}
 				page.Render(w, f)
 			}
+    })
+    
+
+
+// createAnimation()
+func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			for index, stateData := range plotDataArrays {
+				if index != 0 {
+					err := os.Remove("bar.html")
+					if err != nil {
+						errMsg := fmt.Sprintf("Unable to remove the 'bar.html' for stateData %d, before new render for stateData %d", index-1, index)
+						ErrMsgHandler(errMsg, err)
+					}
+				}
+				f, err := os.Create("bar.html")
+				if err != nil {
+					errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+					ErrMsgHandler(errMsg, err)
+				}
+				page.Add(
+					baseBar(xAxisItems, algorithmName, stateData),
+				)
+				page.Render(w, f)
+			}
 		})
+}
+
+
+
+// baseBar
+func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	return bar
+}
+
+// baseBar
+func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	for index, stateData := range plotDataArrays {
+		if index == 0 {
+			bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+		} else {
+			bar.Overlap(bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData))
+		}
+	}
+	return bar
+}

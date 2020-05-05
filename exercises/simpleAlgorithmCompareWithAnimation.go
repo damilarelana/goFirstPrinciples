@@ -329,8 +329,8 @@ func updateAnimationDataMap(arrayWhileSorting []int, key int, plotDataMapPtr *ma
 	(*plotDataMapPtr)[key] = augmentedArray // add augmentArray to map : Golang automatically accommodates new key
 }
 
-// baseBar
-func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
+// genericBar
+func genericBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.TitleOpts{Title: algorithmName},
@@ -340,31 +340,33 @@ func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Ba
 	return bar
 }
 
+// overlapBar
+func overlapBar(baseBar *charts.Bar, xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
+	baseBar.Overlap(genericBar(xAxisItems, algorithmName, plotDataArrays[1]))
+	return baseBar
+}
+
 // createAnimation()
 func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, _ *http.Request) {
 			lastIndex := arrayLength - 1
 			xAxisItems := createRandomArray(0, lastIndex, 1)
-			for index, stateData := range plotDataArrays {
-				if index != 0 {
-					err := os.Remove("bar.html")
-					if err != nil {
-						errMsg := fmt.Sprintf("Unable to remove the 'bar.html' for stateData %d, before new render for stateData %d", index-1, index)
-						ErrMsgHandler(errMsg, err)
-					}
-				}
-				page := charts.NewPage()
-				f, err := os.Create("bar.html")
-				if err != nil {
-					errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
-					ErrMsgHandler(errMsg, err)
-				}
-				page.Add(
-					baseBar(xAxisItems, algorithmName, stateData),
-				)
-				page.Render(w, f)
+			page := charts.NewPage()
+			err := os.Remove("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
+				ErrMsgHandler(errMsg, err)
 			}
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			page.Add(
+				overlapBar(genericBar(xAxisItems, algorithmName, plotDataArrays[0]), xAxisItems, algorithmName, plotDataArrays),
+			)
+			page.Render(w, f)
 		})
 }
 

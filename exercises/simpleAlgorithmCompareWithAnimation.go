@@ -329,8 +329,19 @@ func updateAnimationDataMap(arrayWhileSorting []int, key int, plotDataMapPtr *ma
 	(*plotDataMapPtr)[key] = augmentedArray // add augmentArray to map : Golang automatically accommodates new key
 }
 
-// genericBar
-func genericBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
+// blankBarChart
+func blankBarChart(xAxisItems []int, algorithmName string) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	bar.AddXAxis(xAxisItems)
+	return bar
+}
+
+// genericBarChart
+func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.TitleOpts{Title: algorithmName},
@@ -340,10 +351,11 @@ func genericBar(xAxisItems []int, algorithmName string, stateData []int) *charts
 	return bar
 }
 
-// overlapBar
-func overlapBar(baseBar *charts.Bar, xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
-	baseBar.Overlap(genericBar(xAxisItems, algorithmName, plotDataArrays[1]))
-	return baseBar
+// overlapBarChart
+func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
+	bar = blankBarChart(xAxisItems, algorithmName)
+	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
+	return bar
 }
 
 // createAnimation()
@@ -363,10 +375,12 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
 				ErrMsgHandler(errMsg, err)
 			}
-			page.Add(
-				overlapBar(genericBar(xAxisItems, algorithmName, plotDataArrays[0]), xAxisItems, algorithmName, plotDataArrays),
-			)
-			page.Render(w, f)
+			for _, stateData := range plotDataArrays {
+				page.Add(
+					overlapBarChart(xAxisItems, algorithmName, stateData),
+				)
+				page.Render(w, f)
+			}
 		})
 }
 

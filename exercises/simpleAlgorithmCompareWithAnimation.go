@@ -375,12 +375,10 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
 				ErrMsgHandler(errMsg, err)
 			}
-			for _, stateData := range plotDataArrays {
-				page.Add(
-					overlapBarChart(xAxisItems, algorithmName, stateData),
-				)
-				page.Render(w, f)
-			}
+			page.Add(
+				overlapBarChart(xAxisItems, algorithmName, plotDataArrays[2]),
+			)
+			page.Render(w, f)
 		})
 }
 

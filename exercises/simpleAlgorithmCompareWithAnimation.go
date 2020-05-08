@@ -354,12 +354,13 @@ func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) *c
 // overlapBarChart
 func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
 	bar = blankBarChart(xAxisItems, algorithmName)
+	time.Sleep(2 * time.Second)
 	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
 	return bar
 }
 
 // createAnimation()
-func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+func createAnimation(stateData []int, arrayLength int, algorithmName string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, _ *http.Request) {
 			lastIndex := arrayLength - 1
@@ -376,16 +377,25 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 				ErrMsgHandler(errMsg, err)
 			}
 			page.Add(
-				overlapBarChart(xAxisItems, algorithmName, plotDataArrays[2]),
+				overlapBarChart(xAxisItems, algorithmName, stateData),
 			)
 			page.Render(w, f)
 		})
 }
 
+// animationLoop()
+func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	numOfStates := len(plotDataArrays)
+	for _, stateData := range plotDataArrays {
+		return createAnimation(stateData, arrayLength, algorithmName)
+	}
+	return createAnimation(plotDataArrays[numOfStates-1], arrayLength, algorithmName) // renders last state twice, but need to complete the function
+}
+
 // defaultMux defines the router Mux
 func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *mux.Router {
 	newRouter := mux.NewRouter().StrictSlash(true)
-	newRouter.Handle("/", createAnimation(plotDataArrays, arrayLength, algorithmName))
+	newRouter.Handle("/", animationLoop(plotDataArrays, arrayLength, algorithmName))
 	return newRouter
 }
 

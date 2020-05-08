@@ -398,3 +398,64 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 			page.Render(w, f)
 		})
 }
+
+// blankBarChart
+func blankBarChart(xAxisItems []int, algorithmName string) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	bar.AddXAxis(xAxisItems)
+	return bar
+}
+
+// genericBarChart
+func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	return bar
+}
+
+// overlapBarChart
+func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
+	bar = blankBarChart(xAxisItems, algorithmName)
+	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
+	return bar
+}
+
+// createAnimation()
+func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			err := os.Remove("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			page.Add(
+				overlapBarChart(xAxisItems, algorithmName, plotDataArrays[2]),
+			)
+			page.Render(w, f)
+		})
+}
+
+
+// defaultMux defines the router Mux
+func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *mux.Router {
+	newRouter := mux.NewRouter().StrictSlash(true)
+	newRouter.Handle("/", createAnimation(plotDataArrays, arrayLength, algorithmName))
+	return newRouter
+}

@@ -331,65 +331,67 @@ func updateAnimationDataMap(arrayWhileSorting []int, key int, plotDataMapPtr *ma
 
 // blankBarChart
 func blankBarChart(xAxisItems []int, algorithmName string) *charts.Bar {
-	bar := charts.NewBar()
-	bar.SetGlobalOptions(
+	blankBar := charts.NewBar()
+	blankBar.SetGlobalOptions(
 		charts.TitleOpts{Title: algorithmName},
 		charts.ToolboxOpts{Show: true},
 	)
-	bar.AddXAxis(xAxisItems)
-	return bar
+	blankBar.AddXAxis(xAxisItems)
+	return blankBar
 }
 
 // genericBarChart
 func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
-	bar := charts.NewBar()
-	bar.SetGlobalOptions(
+	genericBar := charts.NewBar()
+	genericBar.SetGlobalOptions(
 		charts.TitleOpts{Title: algorithmName},
 		charts.ToolboxOpts{Show: true},
 	)
-	bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
-	return bar
+	genericBar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	return genericBar
 }
 
 // overlapBarChart
 func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
 	bar = blankBarChart(xAxisItems, algorithmName)
-	time.Sleep(2 * time.Second)
+	time.Sleep(2 * time.Second) // delay to help see the render while opening the browser
 	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
 	return bar
 }
 
 // createAnimation()
-func createAnimation(stateData []int, arrayLength int, algorithmName string) http.Handler {
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, _ *http.Request) {
-			lastIndex := arrayLength - 1
-			xAxisItems := createRandomArray(0, lastIndex, 1)
-			page := charts.NewPage()
-			err := os.Remove("bar.html")
-			if err != nil {
-				errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
-				ErrMsgHandler(errMsg, err)
-			}
-			f, err := os.Create("bar.html")
-			if err != nil {
-				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
-				ErrMsgHandler(errMsg, err)
-			}
-			page.Add(
-				overlapBarChart(xAxisItems, algorithmName, stateData),
-			)
-			page.Render(w, f)
-		})
+func createAnimation(stateData []int, arrayLength int, algorithmName string) (page *charts.Page, f *os.File) {
+	lastIndex := arrayLength - 1
+	xAxisItems := createRandomArray(0, lastIndex, 1)
+	page = charts.NewPage()
+	err := os.Remove("bar.html")
+	if err != nil {
+		errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
+		ErrMsgHandler(errMsg, err)
+	}
+	f, err = os.Create("bar.html")
+	if err != nil {
+		errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+		ErrMsgHandler(errMsg, err)
+	}
+	page.Add(
+		overlapBarChart(xAxisItems, algorithmName, stateData),
+	)
+	return page, f
 }
 
 // animationLoop()
 func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
-	numOfStates := len(plotDataArrays)
-	for _, stateData := range plotDataArrays {
-		return createAnimation(stateData, arrayLength, algorithmName)
-	}
-	return createAnimation(plotDataArrays[numOfStates-1], arrayLength, algorithmName) // renders last state twice, but need to complete the function
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			// numOfStates := len(plotDataArrays)
+			for _, stateData := range plotDataArrays {
+				page, f := createAnimation(stateData, arrayLength, algorithmName)
+				fmt.Println("Page pointer: ", page)
+				fmt.Println("File pointer: ", f)
+				page.Render(w, f)
+			}
+		})
 }
 
 // defaultMux defines the router Mux

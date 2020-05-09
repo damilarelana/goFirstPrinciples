@@ -459,3 +459,53 @@ func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *
 	newRouter.Handle("/", createAnimation(plotDataArrays, arrayLength, algorithmName))
 	return newRouter
 }
+
+
+
+// overlapBarChart
+func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
+	bar = blankBarChart(xAxisItems, algorithmName)
+	time.Sleep(2 * time.Second) // delay to help see the render while opening the browser
+	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
+	return bar
+}
+
+// createAnimation()
+func createAnimation(stateData []int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			err := os.Remove("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			page.Add(
+				overlapBarChart(xAxisItems, algorithmName, stateData),
+			)
+			page.Render(w, f)
+		})
+}
+
+// animationLoop()
+func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	numOfStates := len(plotDataArrays)
+	for _, stateData := range plotDataArrays {
+		return createAnimation(stateData, arrayLength, algorithmName)
+	}
+	return createAnimation(plotDataArrays[numOfStates-1], arrayLength, algorithmName) // renders last state twice, but need to complete the function
+}
+
+// defaultMux defines the router Mux
+func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *mux.Router {
+	newRouter := mux.NewRouter().StrictSlash(true)
+	newRouter.Handle("/", animationLoop(plotDataArrays, arrayLength, algorithmName))
+	return newRouter
+}

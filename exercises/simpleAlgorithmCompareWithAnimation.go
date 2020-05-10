@@ -388,7 +388,6 @@ func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string
 			// numOfStates := len(plotDataArrays)
 			for _, stateData := range plotDataArrays {
 				returnedBlankBarPtr := createAnimation(stateData, xAxisItems, algorithmName)
-				returnedBlankBarPtr.SaveAsImage{}
 				returnedBlankBarPtr.Render((*wPtr), fPtr)
 			}
 		})

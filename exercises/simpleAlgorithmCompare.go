@@ -248,7 +248,7 @@ func indexSplitter(inputListLowerIndex int, inputListUpperIndex int) int {
 
 func main() {
 
-	initialArray := createRandomList(0, 124763545, 48)
+	initialArray := createRandomList(0, 12476354, 48)
 	arrayShuffler(initialArray) // shuffler the elements of the array
 	arrayLength := len(initialArray)
 

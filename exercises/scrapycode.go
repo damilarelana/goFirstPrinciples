@@ -228,6 +228,7 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
     })
     
 
+/* ===================================== */
 
 // createAnimation()
 func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
@@ -257,7 +258,7 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 		})
 }
 
-
+/* ===================================== */
 
 // baseBar
 func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Bar {
@@ -269,7 +270,7 @@ func baseBar(xAxisItems []int, algorithmName string, stateData []int) *charts.Ba
 	bar.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
 	return bar
 }
-
+/* ===================================== */
 // baseBar
 func baseBar(xAxisItems []int, algorithmName string, plotDataArrays [][]int) *charts.Bar {
 	bar := charts.NewBar()
@@ -309,7 +310,7 @@ func overlapBar(baseBar *charts.Bar, xAxisItems []int, algorithmName string, plo
 	return baseBar
 }
 
-
+/* ===================================== */
 
 // blankBarChart
 func blankBarChart(xAxisItems []int, algorithmName string) *charts.Bar {
@@ -368,7 +369,7 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 		})
 }
 
-
+/* ===================================== */
 
 
 // createAnimation()
@@ -398,6 +399,9 @@ func createAnimation(plotDataArrays [][]int, arrayLength int, algorithmName stri
 			page.Render(w, f)
 		})
 }
+
+
+/* ===================================== */
 
 // blankBarChart
 func blankBarChart(xAxisItems []int, algorithmName string) *charts.Bar {
@@ -460,6 +464,7 @@ func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *
 	return newRouter
 }
 
+/* ===================================== */
 
 
 // overlapBarChart
@@ -510,6 +515,7 @@ func defaultMux(plotDataArrays [][]int, arrayLength int, algorithmName string) *
 	return newRouter
 }
 
+/* ===================================== */
 
 // blankBarChart
 func blankBarChart(xAxisItems []int, algorithmName string) (blankBarPtr *charts.Bar) {
@@ -591,6 +597,7 @@ func initRenderWebServer(port string, plotDataArrays [][]int, arrayLength int, a
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
+/* ===================================== */
 
 
 // blankBarChart
@@ -650,6 +657,137 @@ func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string
 			// numOfStates := len(plotDataArrays)
 			for _, stateData := range plotDataArrays {
 				createAnimation(stateData, xAxisItems, algorithmName, fPtr, wPtr, blankBarPtr)
+			}
+		})
+}
+
+/* ===================================== */
+
+// blankBarChart
+func blankBarChart(xAxisItems []int, algorithmName string) (blankBarPtr *charts.Bar) {
+	blankBarPtr = charts.NewBar()
+	blankBarPtr.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	blankBarPtr.AddXAxis(xAxisItems)
+	return
+}
+
+// genericBarChart
+func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) (genericBarPtr *charts.Bar) {
+	genericBarPtr = charts.NewBar()
+	genericBarPtr.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	genericBarPtr.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	return
+}
+
+// overlapBarChart
+func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int) (bar *charts.Bar) {
+	bar = blankBarChart(xAxisItems, algorithmName)
+	time.Sleep(2 * time.Second) // delay to help see the render while opening the browser
+	bar.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
+	return
+}
+
+// createAnimation()
+func createAnimation(stateData []int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+			page := charts.NewPage()
+			err := os.Remove("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to remove previous 'bar.html' for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			f, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+			page.Add(
+				overlapBarChart(xAxisItems, algorithmName, stateData),
+			)
+			page.Render(w, f)
+		})
+}
+
+// animationLoop()
+func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	numOfStates := len(plotDataArrays)
+	for _, stateData := range plotDataArrays {
+		return createAnimation(stateData, arrayLength, algorithmName)
+	}
+	return createAnimation(plotDataArrays[numOfStates-1], arrayLength, algorithmName)
+}
+
+/* ===================================== */
+
+// blankBarChart
+func blankBarChart(xAxisItems []int, algorithmName string) (blankBarPtr *charts.Bar) {
+	blankBarPtr = charts.NewBar()
+	blankBarPtr.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	blankBarPtr.AddXAxis(xAxisItems)
+	return blankBarPtr
+}
+
+// genericBarChart
+func genericBarChart(xAxisItems []int, algorithmName string, stateData []int) (genericBarPtr *charts.Bar) {
+	genericBarPtr = charts.NewBar()
+	genericBarPtr.SetGlobalOptions(
+		charts.TitleOpts{Title: algorithmName},
+		charts.ToolboxOpts{Show: true},
+	)
+	genericBarPtr.AddXAxis(xAxisItems).AddYAxis("Array State", stateData)
+	return genericBarPtr
+}
+
+// overlapBarChart
+func overlapBarChart(xAxisItems []int, algorithmName string, stateData []int, blankBarPtr *charts.Bar) *charts.Bar {
+	// blankBarPtr.Overlap(blankBarChart(xAxisItems, algorithmName))
+	time.Sleep(5 * time.Microsecond) // delay to help see the render while opening the browser
+	blankBarPtr.Overlap(genericBarChart(xAxisItems, algorithmName, stateData))
+	return blankBarPtr
+}
+
+// createAnimation()
+func createAnimation(stateData []int, xAxisItems []int, algorithmName string, blankBarPtr *charts.Bar) (returnedBlankBarPtr *charts.Bar) {
+	returnedBlankBarPtr = overlapBarChart(xAxisItems, algorithmName, stateData, blankBarPtr)
+	return returnedBlankBarPtr
+}
+
+// animationLoop()
+func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, _ *http.Request) {
+
+			fPtr, err := os.Create("bar.html")
+			if err != nil {
+				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+				ErrMsgHandler(errMsg, err)
+			}
+
+			wPtr := &w
+
+			// createXAxisItems
+			lastIndex := arrayLength - 1
+			xAxisItems := createRandomArray(0, lastIndex, 1)
+
+			blankBarPtr := blankBarChart(xAxisItems, algorithmName)
+
+			// numOfStates := len(plotDataArrays)
+			for _, stateData := range plotDataArrays {
+				returnedBlankBarPtr := createAnimation(stateData, xAxisItems, algorithmName, blankBarPtr)
+				returnedBlankBarPtr.Render((*wPtr), fPtr)
+				fmt.Println("ChartID: ", returnedBlankBarPtr.ChartID)
 			}
 		})
 }

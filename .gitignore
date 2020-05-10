@@ -7,6 +7,7 @@
 # Recursively all filles under
 !/exercises/**
 !/testData/**
+!/renderData/**
 
 # Do not include 3rd party packages
 /github.com/*

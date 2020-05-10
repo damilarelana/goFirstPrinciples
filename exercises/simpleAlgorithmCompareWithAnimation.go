@@ -259,9 +259,9 @@ func checkSortedArrayEquivalence(selectionSorted []int, hybridBubblesorted []int
 	hBSiS := reflect.DeepEqual(hybridBubblesorted, insertionsorted)
 	hBSeBS := reflect.DeepEqual(hybridBubblesorted, elegantBubblesorted)
 	if sShBS && hBSmS && hBSiS && hBSeBS {
-		print("\nAll algorithms give the same sorted arrays")
+		fmt.Println("\nAll algorithms give the same sorted arrays")
 	} else {
-		print("\nAll algorithms did NOT give the same sorted arrays")
+		fmt.Println("\nAll algorithms did NOT give the same sorted arrays")
 	}
 }
 

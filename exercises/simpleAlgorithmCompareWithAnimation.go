@@ -366,17 +366,32 @@ func createAnimation(stateData []int, xAxisItems []int, algorithmName string) (r
 	return returnedBlankBarPtr
 }
 
+// create empty HTML file
+func createEmptyHTML() *os.File {
+	fPtr, err := os.Create("bar.html")
+	if err != nil {
+		errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
+		ErrMsgHandler(errMsg, err)
+	}
+	return fPtr
+}
+
+// create empty SVG file
+func createEmptySVG(index int) *os.File {
+	svgPtr, err := os.Create("bar.html")
+	if err != nil {
+		errMsg := fmt.Sprintf("Unable to create render%v.svg for plotDataArray", index)
+		ErrMsgHandler(errMsg, err)
+	}
+	return svgPtr
+}
+
 // animationLoop()
 func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, _ *http.Request) {
 
-			fPtr, err := os.Create("bar.html")
-			if err != nil {
-				errMsg := fmt.Sprintf("Unable to create bar.html for plotDataArray")
-				ErrMsgHandler(errMsg, err)
-			}
-
+			fPtr := createEmptyHTML()
 			wPtr := &w
 
 			// createXAxisItems

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	svg "github.com/ajstarks/svgo"
 	"github.com/go-echarts/go-echarts/charts"
 	"github.com/gorilla/mux"
 )
@@ -378,11 +379,14 @@ func createEmptyHTML() *os.File {
 
 // create empty SVG file
 func createEmptySVG(index int) *os.File {
-	svgPtr, err := os.Create("bar.html")
+	svgFileName := fmt.Sprintf("render%v.svg", index)
+	svgFullFilePath := "../renderData/algorithmCompare/" + svgFileName
+	svgPtr, err := os.Create(svgFullFilePath)
 	if err != nil {
-		errMsg := fmt.Sprintf("Unable to create render%v.svg for plotDataArray", index)
+		errMsg := fmt.Sprintf("Unable to create " + svgFileName + " for plotDataArray")
 		ErrMsgHandler(errMsg, err)
 	}
+	svg.New(svgPtr)
 	return svgPtr
 }
 
@@ -398,11 +402,11 @@ func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string
 			lastIndex := arrayLength - 1
 			xAxisItems := createRandomArray(0, lastIndex, 1)
 
-			// blankBarPtr := blankBarChart(xAxisItems, algorithmName)
-
 			// numOfStates := len(plotDataArrays)
-			for _, stateData := range plotDataArrays {
+			for index, stateData := range plotDataArrays {
 				returnedBlankBarPtr := createAnimation(stateData, xAxisItems, algorithmName)
+				// svgPtr := createEmptySVG(index)
+				// returnedBlankBarPtr.Render(svgPtr)
 				returnedBlankBarPtr.Render((*wPtr), fPtr)
 			}
 		})

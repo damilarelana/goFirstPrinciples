@@ -403,7 +403,7 @@ func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string
 			xAxisItems := createRandomArray(0, lastIndex, 1)
 
 			// numOfStates := len(plotDataArrays)
-			for index, stateData := range plotDataArrays {
+			for _, stateData := range plotDataArrays {
 				returnedBlankBarPtr := createAnimation(stateData, xAxisItems, algorithmName)
 				// svgPtr := createEmptySVG(index)
 				// returnedBlankBarPtr.Render(svgPtr)

@@ -791,3 +791,33 @@ func animationLoop(plotDataArrays [][]int, arrayLength int, algorithmName string
 			}
 		})
 }
+
+
+FROM iron/base
+
+EXPOSE 8080
+ADD accountservice-linux-amd64 /
+ENTRYPOINT [ "./accountservice-linux-amd64" ]
+
+# designate the working directory within the container
+WORKDIR /go/src/github.com/damilarelana/goMicroservice/api
+COPY api .
+COPY mathFunctions ../mathFunctions
+COPY mathService ../mathService
+
+# Install dependencies
+RUN go get -v ./...
+RUN go install -v ./...
+
+# Entrypoint
+ENTRYPOINT ["go", "run", "main.go"]
+
+# Expose the default port
+EXPOSE 8080
+
+
+docker node inspect --format '{{.Status.Addr}}' $(docker node ls -f role=manager)
+docker node ls -f role=manager |  docker node inspect --format '{{.Status.Addr}}'
+
+
+docker build -t systemdesign/accountservice-binary --file /home/Codes/go/src/github.com/damilarelana/goSystemDesign/accountService/Dockerfile.binary accountService/

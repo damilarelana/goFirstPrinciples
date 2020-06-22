@@ -1,27 +1,43 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	var initialNum float64
-	fmt.Println("Enter fibonnaci sequence index:")
-	fmt.Scanf("%f", &initialNum)
-	if initialNum < 0 {
+	var fibIndex int64
+	/*
+		Assumptions:
+		- Fibonacci sequence starts from index `0` when counting the sequence `0, 1, 1, 2, 3 ...`
+		- going from `0` to `1` is one step i.e. `value at index 1` correlates to `number after 1 step`
+	*/
+	fmt.Println(".............. Fibonacci ...............\n")
+	fmt.Println("Assume:")
+	fmt.Println("  - sequence index starts from index `0` for sequence `0, 1, 1, 2, 3 ...`")
+	fmt.Println("  - index `0` means we have not taken any steps")
+	fmt.Println("  - going from `0` to `1` is one step")
+	fmt.Println("  - thus `value at index 1` correlates to `number after 1 step`")
+	fmt.Println("  - likewise `value at index 50` correlates to `number after 50 steps`\n")
+	fmt.Println("......................................\n")
+	fmt.Println("Enter index (i.e. step) of desired Fibonacci number:")
+	fmt.Scanf("%v", &fibIndex)
+	if fibIndex < 0 {
 		fmt.Println("ERROR - Please enter a non-negative number: ")
-		fmt.Scanf("%f", &initialNum)
+		fmt.Scanf("%v", &fibIndex)
 	}
-	computedValue := fibonnaci(initialNum)
-	fmt.Println("Fibonacci value is:", computedValue)
+
+	// start time counter
+	fibStartTime := time.Now()
+	computedValue := computeFibSeq(fibIndex)
+	fibStopTime := time.Now()
+	fmt.Printf("Fibonacci value (after %v steps): %v\n", fibIndex, computedValue)
+	fmt.Printf("runtime: %v seconds \n", fibStopTime.Sub(fibStartTime).Seconds())
 }
 
-func fibonnaci(initialNum float64) (computedNum float64) {
-	zeroOneCase := []float64{0, 1} // this handles both index 0 and 1
-	for _, v := range zeroOneCase {
-		if initialNum == v {
-			computedNum = initialNum
-			return computedNum
-		}
+func computeFibSeq(fibIndex int64) int64 {
+	if fibIndex == 0 || fibIndex == 1 { // this handles both Fibonacci index 0 and 1
+		return fibIndex
 	}
-	computedNum = fibonnaci(initialNum-1) + fibonnaci(initialNum-2)
-	return computedNum
+	return computeFibSeq(fibIndex-1) + computeFibSeq(fibIndex-2)
 }

@@ -5,7 +5,13 @@ import (
 	"time"
 )
 
+// var cachedMapValue int64
+
 func main() {
+
+	// pprof.StartCPUProfile(os.Stdout)
+	// defer pprof.StopCPUProfile()
+
 	var fibIndex int64
 	/*
 		Assumptions:
@@ -16,7 +22,7 @@ func main() {
 			- likewise `value at index 50` correlates to `number after 50 steps`
 		Uses memoization to speed up the number computation
 	*/
-	fmt.Println(".............. Fibonacci (via recursion + memoization) ...............\n")
+	fmt.Println(".............. Fibonacci (recursion-memoization) ...............\n")
 	fmt.Printf("Enter desired Fibonacci index: ")
 	fmt.Scanf("%v", &fibIndex)
 	if fibIndex < 0 {
@@ -28,7 +34,7 @@ func main() {
 	fibStartTime := time.Now()
 	computedValue := computeFibSeq(fibIndex)
 	fibStopTime := time.Now()
-	fmt.Printf("\nFibonacci (via recursion + memoization) value (after %v steps): %v\n", fibIndex, computedValue)
+	fmt.Printf("\nFibonacci (recursion-memoization) value (after %v steps): %v\n", fibIndex, computedValue)
 	fmt.Printf("runtime: %v seconds \n", fibStopTime.Sub(fibStartTime).Seconds())
 }
 
@@ -45,7 +51,6 @@ func cacheMapper(fibIndex int64, fibCacheMap map[int64]int64) int64 {
 		- if it exists then ok is `true`
 		- then proceed to return the cached value
 	*/
-	var cachedMapValue int64
 	cachedMapValue, ok := fibCacheMap[fibIndex]
 	if ok { // returns what is in cache
 		return cachedMapValue

@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
+	// pprof.StartCPUProfile(os.Stdout)
+	// defer pprof.StopCPUProfile()
+
 	var fibIndex int64
 	/*
 			Assumptions:
@@ -15,7 +18,7 @@ func main() {
 		  - thus `value at index 1` correlates to `number after 1 step`"
 		  - likewise `value at index 50` correlates to `number after 50 steps`
 	*/
-	fmt.Println(".............. Fibonacci (via recursion) ...............\n")
+	fmt.Println(".............. Fibonacci (recursion) ...............\n")
 	fmt.Printf("Enter desired Fibonacci index: ")
 	fmt.Scanf("%v", &fibIndex)
 	if fibIndex < 0 {
@@ -27,7 +30,7 @@ func main() {
 	fibStartTime := time.Now()
 	computedValue := computeFibSeq(fibIndex)
 	fibStopTime := time.Now()
-	fmt.Printf("\nFibonacci (via recursion) value (after %v steps): %v\n", fibIndex, computedValue)
+	fmt.Printf("\nFibonacci (recursion) value (after %v steps): %v\n", fibIndex, computedValue)
 	fmt.Printf("runtime: %v seconds \n", fibStopTime.Sub(fibStartTime).Seconds())
 }
 
